@@ -258,6 +258,7 @@ The second experiment requires varying the loop condition for the number of lead
 The third experiment requires that the difficulty be fixed at a specific value and the total runtime be measured as the number of transactions changes. Once we are done iterating over the transactions, the difficulty changes and the process repeats. Since the Merkle runtime and the hashing run time depend on different variables, it will take a 3D plot to figure out how they affect each other. 
 
 \section{Results and Analysis}
+\subsection{SHA256}
 Before moving into the results of note, we will take time here to examine the runtime effect of hashing to see if it has any impact on program complexity. The results are below.
 
 As shown in the graph, the time it takes to execute N hashes increases linearly as N gets large. This is due to the fact that  we only continually hash a modified 80 byte structure. The time it takes to hash an object is constant, and is being attempted N times. If the size of the header were to vary, we could expect that this curve would not be linear.
@@ -314,6 +315,12 @@ As D increases, the probability of finding a solution decreases as a scalar mult
 	\label{fig:hash}
 \end{figure}
 
+\subsection{Merkle Tree}
+The number of transactions selected in Merkle Tree construction has a significant impact on construction time. We constructed Merkle Trees using the number of transactions typically hashed by actual bitcoin miners, between 100 and 1000. In the world of Bitcoin mining, time is money. So miners have an incentive to minimize the amount of computational time they spend doing anything other than generating potential blockchain guesses. Since the number of transactions hashed has no impact on the probability of a successful guess, transaction fees are the only incentive that a miner has to generate a Merkle Tree with more than 0 transactions. 
+
+Empirical results show that growth rate of Merkle Tree build time is quadratic, with a small constant C so that  $~C*N^2$ where $C = 1.315*10^-5$. We can confirm this result theoretically as well. In the Merkle construction phase, 
+
+Our results show that relatively little time is spent constructing the Merkle Tree, as compared to actually computing a hash that below target. Even for unusually large Merkle Trees (N = 1000) hashed at an artificially low difficulty (D = 81),  the time spent computing a successful hash is ~15 times higher. We can expect this ratio to rise further because the growth rate of Merkle tree build time is {\bf O($N^2$)}, while growth rate of difficulty to successful hash rate is {\bf O($e^D$)} or {\bf O($2^N$)}. We can conclude that although growth rate is quadratic, the cost of Merkle tree build time plays a relatively minor role in the overall time cost of mining.
 
 \begin{figure}[H]
 	\centering
@@ -329,14 +336,16 @@ As D increases, the probability of finding a solution decreases as a scalar mult
 	\label{fig:merk}
 \end{figure}
 
-The 3D plot below is obtained from fixing the difficulty and varying the number of transactions and then fixing the number of transactions and varying the difficulty.  To the effect of measuring whether the Merkle build time has a significant effect on the time to solution for a hash level the consensus is: not really. While the number of transactions have an effect on low difficulty levels when the transactions are high (~1000), that effect is mitigated by the time the difficulty reaches higher peaks and really takes off. The exponential growth in time dwarfs the one-time contribution of the quadratic transaction build. 
+\subsection{Effects of Running in Real-Time}
+
+The 3D plot below is obtained from fixing the difficulty and varying the number of transactions and then fixing the number of transactions and varying the difficulty.  To the effect of measuring whether the Merkle build time has a significant effect on the time to solution for a hash level the consensus is: not really. While the number of transactions have an effect on low difficulty levels when the number of transactions inccluded are high (1000), that effect is mitigated by the time the difficulty reaches higher peaks and really takes off. The exponential growth in time dwarfs the one-time contribution of the quadratic transaction build. 
 
 % SolveTimeExp
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=100mm]{figures/SolveTimeExp.pdf}
-	\caption{Exponential time to find a solution at increasing difficulty}
-	\label{SolveTimeExp}
+	\includegraphics[width=100mm]{figures/3Dplot-eps-converted-to.pdf}
+	\caption{As can be seen, the overhead from adding transactions to the merkle root becomes marginal as the difficulty increases}
+	\label{3dgraph}
 \end{figure}
 
 
@@ -344,7 +353,7 @@ The 3D plot below is obtained from fixing the difficulty and varying the number 
 \section{Discussion}
 
 \subsection{Transaction Issues}
-In theory, it would make sense for miners to aggregate as many transactions as possible and try to verify them as quickly as possible. But in practice, miners don't do that. The problem is that Bitcoin is a lottery system. Whoever can get the solution to the block first wins and all other takers must abandon their claim to the prize and start working on another block. As such, there is a lot of competition between miners rather than collusion. Miners are at odds with each other to obtain the block solution first. Although the process is entirely random, there’s something to be said of the effect of time and hashrate. Recalling the expected value of return:
+In theory, it would make sense for miners to aggregate as many transactions as possible and try to verify them as quickly as possible. But in practice, miners don't do that. The problem is that Bitcoin is a lottery system. Whoever can get the solution to the block first wins and all other takers must abandon their claim to the prize and start working on another block. As such, there is a lot of competition between miners rather than collusion. Miners are at odds with each other to obtain the block solution first. Although the process is entirely random, there is something to be said of the effect of time and hashrate. Recalling the expected value of return:
 
 \begin{figure}[H]
 	\centering
