@@ -322,12 +322,19 @@ Empirical results show that growth rate of Merkle Tree build time is {\bf O($N*l
 
 The height of the Merkle Tree having N nodes is about log(N) since the Merkle Tree shares many characterstics with the binary tree data structure. At the same time, the Merkle Tree is more balanced than the normal binary tree, since each hash is a double hash, meaning each non-leaf node has two children and the path length for each leaf is almost the same. In order words, Merkle Tree is more like a complete binary tree or full binary tree depending on the number of transactions in the tree. Inserting a new node (or transaction) into the Merkle tree with size N would take about {\bf O($log(N)$)} complexity. Building a Merkle Tree requires N insertions, so the total complexity is about {\bf O($N*log(N)$)}. Since the high of the Merkle Tree changes from 0 to $log(N)$ while building the tree, the exact form of complexity is not $c*N*log(N)$. From the curve fitting of our result, we found the complexity for building the Merkle Tree matches with the form: $a+b*N+c*N*log(N)+d*log(N)$ where $a$, $b$, $c$, and $d$ are constant (please see fitting curve and function in Figure \ref{MerkComp}). The big O notation for it is also {\bf O($N*log(N)$)}. Three other terms besides the $N*log(N)$ term in the fitting function is due to some initialization operations, and conditional operations within the loops.
 
-% Merkle Build weird fit thing
+
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=100mm]{figures/MerkComp.pdf}
-	\caption{Time to build Merkle Tree with N transactions}
-	\label{MerkComp}
+	\begin{subfigure}[H]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{figures/MerkComp.pdf}
+		\caption{Time to build Merkle Tree with N transactions}
+	\end{subfigure}
+	\begin{subfigure}[H]{0.4\textwidth}
+		\includegraphics[width=\textwidth]{figures/Overtake.pdf}
+		\caption{Comparison between quadtratic and linearithmic with a data point at 3000}
+	\end{subfigure}
+	\caption{}
+	\label{fig:merk2}
 \end{figure}
 
 Our results show that relatively little time is spent constructing the Merkle Tree, as compared to actually computing a hash that below target. Even for unusually large Merkle Trees (N = 1000) hashed at an artificially low difficulty (D = 81), the time spent computing a successful hash is 15 times higher. We can expect this ratio to rise further because the growth rate of Merkle tree build time is {\bf O($N^2$)}, while growth rate of difficulty to successful hash rate is {\bf O($e^D$)} or {\bf O($2^N$)}. We can conclude that although growth rate is quadratic, the cost of Merkle tree build time plays a relatively minor role in the overall time cost of mining.
